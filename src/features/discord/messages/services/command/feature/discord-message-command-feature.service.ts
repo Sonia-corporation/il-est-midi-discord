@@ -1,4 +1,5 @@
 import { DiscordMessageCommandFeatureNameEnum } from './enums/discord-message-command-feature-name.enum';
+import { DiscordMessageCommandFeatureFlagsService } from './features/flags/discord-message-command-feature-flags.service';
 import { DISCORD_MESSAGE_COMMAND_FEATURE_NOON_FLAGS } from './features/noon/constants/discord-message-command-feature-noon-flags';
 import { DiscordMessageCommandFeatureNoonService } from './features/noon/services/discord-message-command-feature-noon.service';
 import { DISCORD_MESSAGE_COMMAND_FEATURE_RELEASE_NOTES_FLAGS } from './features/release-notes/constants/discord-message-command-feature-release-notes-flags';
@@ -69,6 +70,10 @@ export class DiscordMessageCommandFeatureService extends AbstractService {
     // Small type hack but the other way is to use instanceof and it's not nice for the testing purposes
     const message: Message = anyDiscordMessage as Message;
     const featureName: string | null = this._getFeatureName(message.content);
+
+    if (DiscordMessageCommandFeatureFlagsService.getInstance().hasFlag(message.content)) {
+      return DiscordMessageCommandFeatureFlagsService.getInstance().getMessageResponse(message.content);
+    }
 
     if (_.isNil(featureName)) {
       LoggerService.getInstance().debug({
